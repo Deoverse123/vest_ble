@@ -1,74 +1,57 @@
-/*
-  Callback LED
 
-  This example creates a Bluetooth® Low Energy peripheral with service that contains a
-  characteristic to control an LED. The callback features of the
-  library are used.
-
-  The circuit:
-  - Arduino MKR WiFi 1010, Arduino Uno WiFi Rev2 board, Arduino Nano 33 IoT,
-    Arduino Nano 33 BLE, or Arduino Nano 33 BLE Sense board.
-
-  You can use a generic Bluetooth® Low Energy central app, like LightBlue (iOS and Android) or
-  nRF Connect (Android), to interact with the services and characteristics
-  created in this sketch.
-
-  This example code is in the public domain.
-*/
 
 #include <ArduinoBLE.h>
 
-BLEService ledService("1101"); // create service
+BLEService vestService("1101"); // create service
 
 // create switch characteristic and allow remote device to read and write
-BLEStringCharacteristic switchCharacteristic("2101", BLEWrite, 4);
-// BLEByteCharacteristic switchCharacteristic2("2105", BLERead | BLEWrite);
+BLEStringCharacteristic hapticCharacteristic("2101", BLEWrite, 4);
+BLEUnsignedCharCharacteristic batteryLevelChar("2105", BLERead | BLENotify);
 
 const int ledPin = LED_BUILTIN; // pin to use for the LED
 
+int oldBatteryLevel = 0;          // last battery level reading from analog input
+unsigned long previousMillis = 0; // last time the battery level was checked, in ms
+bool isSubscribed = false;
 
-// inline const char * typeStr (int   var) { return " int "; }
-// inline const char * typeStr (long  var) { return " long "; }
-// inline const char * typeStr (float var) { return " float "; }
-// inline const char * typeStr (const char *var) { return " char "; }
+void setup()
+{
+  Serial.begin(115200);
+  while (!Serial)
+    ;
 
-
-
-void setup() {
-  Serial.begin(9600);
-  while (!Serial);
-  
   pinMode(ledPin, OUTPUT); // use the LED pin as an output
 
   // begin initialization
-  if (!BLE.begin()) {
+  if (!BLE.begin())
+  {
     Serial.println("starting Bluetooth® Low Energy module failed!");
 
-    while (1);
+    while (1)
+      ;
   }
 
   // set the local name peripheral advertises
-  BLE.setLocalName("LEDCallback");
+  BLE.setLocalName("DVest");
   // set the UUID for the service this peripheral advertises
-  BLE.setAdvertisedService(ledService);
+  BLE.setAdvertisedService(vestService);
 
   // add the characteristic to the service
-  ledService.addCharacteristic(switchCharacteristic);
-  // ledService.addCharacteristic(switchCharacteristic2);
+  vestService.addCharacteristic(hapticCharacteristic);
+  vestService.addCharacteristic(batteryLevelChar);
 
   // add service
-  BLE.addService(ledService);
+  BLE.addService(vestService);
+
+  batteryLevelChar.writeValue(oldBatteryLevel); // set initial value for this characteristic
 
   // assign event handlers for connected, disconnected to peripheral
   BLE.setEventHandler(BLEConnected, blePeripheralConnectHandler);
   BLE.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
 
   // assign event handlers for characteristic
-  switchCharacteristic.setEventHandler(BLEWritten, switchCharacteristicWritten);
-  // switchCharacteristic2.setEventHandler(BLEWritten, switchCharacteristicWritten2);
-  // set an initial value for the characteristic
-  // switchCharacteristic.setValue(0);
-  // switchCharacteristic2.setValue(0);
+  hapticCharacteristic.setEventHandler(BLEWritten, hapticCharacteristicWritten);
+  batteryLevelChar.setEventHandler(BLESubscribed, updateBatteryLevel);
 
   // start advertising
   BLE.advertise();
@@ -76,91 +59,104 @@ void setup() {
   Serial.println(("Bluetooth® device active, waiting for connections..."));
 }
 
-void loop() {
+void loop()
+{
+  /* Read the current voltage level on the A0 analog input pin.
+     This is used here to simulate the charge level of a battery.
+  */
+  if (isSubscribed)
+  { 
+    // Serial.println("Subscribed");
+    long currentMillis = millis();
+    // if 200ms have passed, check the battery level:
+    if (currentMillis - previousMillis >= 10000)
+    {
+      // Serial.println("HAI");
+      previousMillis = currentMillis;
+      int battery = analogRead(A0);
+      int batteryLevel = map(battery, 0, 1023, 0, 100);
+
+      if (batteryLevel != oldBatteryLevel)
+      {                                           // if the battery level has changed
+        Serial.print("Battery Level % is now: "); // print it
+        Serial.println(batteryLevel);
+        batteryLevelChar.writeValue(batteryLevel); // and update the battery level characteristic
+        oldBatteryLevel = batteryLevel;            // save the level for next comparison
+      }
+    }
+  }
+
   // poll for Bluetooth® Low Energy events
   BLE.poll();
 }
 
-void blePeripheralConnectHandler(BLEDevice central) {
+void blePeripheralConnectHandler(BLEDevice central)
+{
   // central connected event handler
   Serial.print("Connected event, central: ");
   Serial.println(central.address());
+  digitalWrite(LED_BUILTIN, HIGH);
 }
 
-void blePeripheralDisconnectHandler(BLEDevice central) {
+void blePeripheralDisconnectHandler(BLEDevice central)
+{
   // central disconnected event handler
   Serial.print("Disconnected event, central: ");
   Serial.println(central.address());
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
-void switchCharacteristicWritten(BLEDevice central, BLECharacteristic characteristic) {
+void hapticCharacteristicWritten(BLEDevice central, BLECharacteristic characteristic)
+{
   // central wrote new value to characteristic, update LED
   // Serial.print("Characteristic event, written: ");
 
-  if (true) {
-    Serial.println(switchCharacteristic.value());
-
-
-  // String inputString = "AA";
-  // int asciiValue = 0;
-
-  // for (int i = 0; i < inputString.length(); i++) {
-  //   asciiValue = asciiValue * 100 + inputString[i]; // Multiply by 256 to shift one character to the left
-  // }
-
-  // Serial.println(asciiValue);
-
-
-
-    // char x = switchCharacteristic.value();
-
-    // Serial.println(switchCharacteristic.value().toInt());
-    // Serial.println(String(switchCharacteristic.value()));
-    // Serial.print (typeStr(switchCharacteristic.value())); Serial.println (switchCharacteristic.value());
-    // Serial.println(typeof(switchCharacteristic.value()));
-    // Serial.println(switchCharacteristic.valueBE());
+  if (hapticCharacteristic.value())
+  {
+    // Serial.println(hapticCharacteristic.value());
     uint8_t buffer[20];
-    int bytesRead = switchCharacteristic.readValue(buffer, sizeof(buffer));
+    int bytesRead = hapticCharacteristic.readValue(buffer, sizeof(buffer));
 
     Serial.print("Received bytes: ");
-    for (int i = 0; i < bytesRead; i++) {
+    for (int i = 0; i < bytesRead; i++)
+    {
       Serial.print(buffer[i], HEX);
       Serial.print(" ");
     }
     Serial.println(" ");
-
-
-    unsigned int dataHex[42] = {};
-    Serial.println(switchCharacteristic.readValue(dataHex, 300));
-    // Serial.println(switchCharacteristic.valueLE());
-    Serial.println(switchCharacteristic.valueSize());
-    // Serial.println(switchCharacteristic.valueUpdated());
-    Serial.println(dataHex[0]);
-    // Serial.println(dataHex[1]);
-
-    
-
     // unsigned int dataHex[42] = {};
-    // switchCharacteristic.readValue(dataHex, 42);
-    // Serial.println();
-    // // Serial.println(switchCharacteristic2.value());
-    // // Serial.println(switchCharacteristic.read());
-    // // Serial.println(switchCharacteristic.);
-
-    // // unsigned int dataHex[42] = {};
-    // // Serial.println(switchCharacteristic.readValue(dataHex, 42));
-    // for (int i = 0; i < 42; i++) {
-    //     Serial.println(dataHex[i]);
-    //     }
-    
-
-    // Serial.println(switchCharacteristic.valueLE());
-    // Serial.println(event[1]);
+    // Serial.println(hapticCharacteristic.readValue(dataHex, 300));
+    // Serial.println(hapticCharacteristic.valueSize());
+    // Serial.println(dataHex[0]);
     Serial.println("LED on");
     digitalWrite(ledPin, HIGH);
-  } else {
+  }
+  else
+  {
     Serial.println("LED off");
     digitalWrite(ledPin, LOW);
   }
 }
 
+void updateBatteryLevel(BLEDevice central, BLECharacteristic characteristic)
+{
+  /* Read the current voltage level on the A0 analog input pin.
+     This is used here to simulate the charge level of a battery.
+  */
+  // long currentMillis = millis();
+  //     // if 200ms have passed, check the battery level:
+  // while (currentMillis - previousMillis >= 1000) {
+  //   Serial.println("HAI");
+  //   previousMillis = currentMillis;
+  //   int battery = analogRead(A0);
+  //   int batteryLevel = map(battery, 0, 1023, 0, 100);
+
+  //   if (batteryLevel != oldBatteryLevel) {      // if the battery level has changed
+  //     Serial.print("Battery Level % is now: "); // print it
+  //     Serial.println(batteryLevel);
+  //     batteryLevelChar.writeValue(batteryLevel);  // and update the battery level characteristic
+  //     oldBatteryLevel = batteryLevel;           // save the level for next comparison
+  //   }
+  // }
+  isSubscribed = true;
+}
