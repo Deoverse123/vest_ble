@@ -52,6 +52,7 @@ void setup()
   // assign event handlers for characteristic
   hapticCharacteristic.setEventHandler(BLEWritten, hapticCharacteristicWritten);
   batteryLevelChar.setEventHandler(BLESubscribed, updateBatteryLevel);
+  batteryLevelChar.setEventHandler(BLEUnsubscribed, endBatteryLevel);
 
   // start advertising
   BLE.advertise();
@@ -140,23 +141,12 @@ void hapticCharacteristicWritten(BLEDevice central, BLECharacteristic characteri
 
 void updateBatteryLevel(BLEDevice central, BLECharacteristic characteristic)
 {
-  /* Read the current voltage level on the A0 analog input pin.
-     This is used here to simulate the charge level of a battery.
-  */
-  // long currentMillis = millis();
-  //     // if 200ms have passed, check the battery level:
-  // while (currentMillis - previousMillis >= 1000) {
-  //   Serial.println("HAI");
-  //   previousMillis = currentMillis;
-  //   int battery = analogRead(A0);
-  //   int batteryLevel = map(battery, 0, 1023, 0, 100);
-
-  //   if (batteryLevel != oldBatteryLevel) {      // if the battery level has changed
-  //     Serial.print("Battery Level % is now: "); // print it
-  //     Serial.println(batteryLevel);
-  //     batteryLevelChar.writeValue(batteryLevel);  // and update the battery level characteristic
-  //     oldBatteryLevel = batteryLevel;           // save the level for next comparison
-  //   }
-  // }
+  // Start battery Notification
   isSubscribed = true;
+}
+
+void endBatteryLevel(BLEDevice central, BLECharacteristic characteristic)
+{
+  // End battery Notification
+  isSubscribed = false;
 }
