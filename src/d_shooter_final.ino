@@ -21,6 +21,12 @@ void setup()
     ;
 
   pinMode(ledPin, OUTPUT); // use the LED pin as an output
+  pinMode(16, OUTPUT);
+  pinMode(17, OUTPUT);
+  pinMode(18, OUTPUT);
+  pinMode(19, OUTPUT);
+  pinMode(21, OUTPUT);
+  pinMode(22, OUTPUT);
 
   // begin initialization
   if (!BLE.begin())
@@ -117,6 +123,7 @@ void hapticCharacteristicWritten(BLEDevice central, BLECharacteristic characteri
     // Serial.println(hapticCharacteristic.value());
     uint8_t buffer[20];
     int bytesRead = hapticCharacteristic.readValue(buffer, sizeof(buffer));
+    // Serial.println(buffer[0]);
 
     Serial.print("Received bytes: ");
     for (int i = 0; i < bytesRead; i++)
@@ -129,6 +136,34 @@ void hapticCharacteristicWritten(BLEDevice central, BLECharacteristic characteri
     // Serial.println(hapticCharacteristic.readValue(dataHex, 300));
     // Serial.println(hapticCharacteristic.valueSize());
     // Serial.println(dataHex[0]);
+    if ((buffer[0]) == 1) {
+      haptix(16,17,150,10);
+    }
+    if ((buffer[0]) == 2) {
+      haptix(18,17,150,10);
+    }
+    if ((buffer[0]) == 3) {
+      haptix(21,17,150,10);
+    }
+    if ((buffer[0]) == 4) {
+      haptix(16,19,150,10);
+    }
+    if ((buffer[0]) == 5) {
+      haptix(18,19,150,10);
+    }
+    if ((buffer[0]) == 6) {
+      haptix(21,19,150,10);
+    }
+    if ((buffer[0]) == 7) {
+      haptix(16,22,150,10);
+    }
+    if ((buffer[0]) == 8) {
+      haptix(18,22,150,10);
+    }
+    if ((buffer[0]) == 9) {
+      haptix(21,22,150,10);
+    }
+
     Serial.println("LED on");
     digitalWrite(ledPin, HIGH);
   }
@@ -149,4 +184,15 @@ void endBatteryLevel(BLEDevice central, BLECharacteristic characteristic)
 {
   // End battery Notification
   isSubscribed = false;
+}
+
+void haptix(int pin_num1, int pin_num2, int delay_time, int impulse){
+  digitalWrite(pin_num1, HIGH);
+  digitalWrite(pin_num2, HIGH);
+  Serial.print(pin_num1);
+  Serial.print(" , ");
+  Serial.println(pin_num2);
+  delay(delay_time);
+  digitalWrite(pin_num1, LOW);
+  digitalWrite(pin_num2, LOW);
 }
