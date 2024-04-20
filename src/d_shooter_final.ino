@@ -5,14 +5,20 @@
 BLEService vestService("1101"); // create service
 
 // create switch characteristic and allow remote device to read and write
-BLEStringCharacteristic hapticCharacteristic("2101", BLEWrite, 4);
+BLEByteCharacteristic hapticCharacteristic("2101", BLEWrite);
 BLEUnsignedCharCharacteristic batteryLevelChar("2105", BLERead | BLENotify);
 
-const int ledPin = LED_BUILTIN; // pin to use for the LED
 
 int oldBatteryLevel = 0;          // last battery level reading from analog input
 unsigned long previousMillis = 0; // last time the battery level was checked, in ms
 bool isSubscribed = false;
+
+// int preMillis = 0;
+// int interval = 1000;
+unsigned long previousMilliss = 0; // stores the last time the LED was updated
+const long intervals = 300; // interval at which to blink (milliseconds)
+bool ledOn = false; // flag to track LED state
+const int ledPin = 27; // the number of the LED pin
 
 void setup()
 {
@@ -93,6 +99,12 @@ void loop()
     }
   }
 
+  if (ledOn && (millis() - previousMilliss >= intervals)) {
+    digitalWrite(16, LOW); // Turn off the LED
+    digitalWrite(17, LOW); // Turn off the LED
+    digitalWrite(ledPin, LOW); // Turn off the LED
+    ledOn = false;
+  }
   // poll for Bluetooth® Low Energy events
   BLE.poll();
 }
@@ -137,32 +149,41 @@ void hapticCharacteristicWritten(BLEDevice central, BLECharacteristic characteri
     // Serial.println(hapticCharacteristic.valueSize());
     // Serial.println(dataHex[0]);
     if ((buffer[0]) == 1) {
-      haptix(16,17,150,10);
+      
+      haptix(16,17,10,10);
+      digitalWrite(ledPin, HIGH);
+      ledOn = true;
+      previousMilliss = millis();
+      
+      
     }
-    if ((buffer[0]) == 2) {
-      haptix(18,17,150,10);
-    }
-    if ((buffer[0]) == 3) {
-      haptix(21,17,150,10);
-    }
-    if ((buffer[0]) == 4) {
-      haptix(16,19,150,10);
-    }
-    if ((buffer[0]) == 5) {
-      haptix(18,19,150,10);
-    }
-    if ((buffer[0]) == 6) {
-      haptix(21,19,150,10);
-    }
-    if ((buffer[0]) == 7) {
-      haptix(16,22,150,10);
-    }
-    if ((buffer[0]) == 8) {
-      haptix(18,22,150,10);
-    }
-    if ((buffer[0]) == 9) {
-      haptix(21,22,150,10);
-    }
+    // if ((buffer[0]) == 2) {
+    //   haptix(18,17,10,10);
+    // }
+    // if ((buffer[0]) == 3) {
+    //   haptix(21,17,10,10);
+    // }
+    // if ((buffer[0]) == 4) {
+    //   haptix(16,19,10,10);
+    // }
+    // if ((buffer[0]) == 5) {
+    //   haptix(18,19,10,10);
+    // }
+    // if ((buffer[0]) == 6) {
+    //   haptix(21,19,10,10);
+    // }
+    // if ((buffer[0]) == 7) {
+    //   haptix(16,22,10,10);
+    // }
+    // if ((buffer[0]) == 8) {
+    //   haptix(18,22,10,10);
+    // }
+    // if ((buffer[0]) == 9) {
+    //   haptix(21,22,10,10);
+    // }
+
+
+
 
     Serial.println("LED on");
     digitalWrite(ledPin, HIGH);
@@ -189,10 +210,33 @@ void endBatteryLevel(BLEDevice central, BLECharacteristic characteristic)
 void haptix(int pin_num1, int pin_num2, int delay_time, int impulse){
   digitalWrite(pin_num1, HIGH);
   digitalWrite(pin_num2, HIGH);
-  Serial.print(pin_num1);
-  Serial.print(" , ");
-  Serial.println(pin_num2);
-  delay(delay_time);
-  digitalWrite(pin_num1, LOW);
-  digitalWrite(pin_num2, LOW);
+  // Serial.print(pin_num1); Serial.print(" , "); Serial.println(pin_num2);
+  
+  
+  // delay(delay_time);
+  // digitalWrite(pin_num1, LOW);
+  // digitalWrite(pin_num2, LOW);
+
+  // haptix_off();
 }
+
+// void haptix_off(){
+//   unsigned long millisec = millis();
+  
+//   if (millisec - preMillis >= interval) {
+
+//     // save the last time you blinked the LED
+//     preMillis = millisec;
+//     digitalWrite(16, LOW);
+//     digitalWrite(17, LOW);
+//     Serial.println(millisec);
+//   }
+
+//     // // if the LED is off turn it on and vice-versa:
+//     // if (ledState == LOW) {
+//     //   ledState = HIGH;
+//     // } else {
+//     //   ledState = LOW;
+//     // }
+
+// }
