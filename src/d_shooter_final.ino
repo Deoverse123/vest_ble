@@ -15,9 +15,31 @@ bool isSubscribed = false;
 
 // int preMillis = 0;
 // int interval = 1000;
-unsigned long previousMilliss = 0; // stores the last time the LED was updated
-const long intervals = 300; // interval at which to blink (milliseconds)
-bool ledOn = false; // flag to track LED state
+// unsigned long currentMill = 0; // last time the battery level was checked, in ms
+
+unsigned long pVestMillis1 = 0; // millis for point 1
+unsigned long pVestMillis2 = 0; // millis for point 2
+unsigned long pVestMillis3 = 0; // millis for point 3
+unsigned long pVestMillis4 = 0; // millis for point 4
+unsigned long pVestMillis5 = 0; // millis for point 5
+unsigned long pVestMillis6 = 0; // millis for point 6
+unsigned long pVestMillis7 = 0; // millis for point 7
+unsigned long pVestMillis8 = 0; // millis for point 8
+unsigned long pVestMillis9 = 0; // millis for point 9
+
+bool pin1_On = false; // flag to track pin1 trigger status
+bool pin2_On = false; // flag to track pin2 trigger status
+bool pin3_On = false; // flag to track pin3 trigger status
+bool pin4_On = false; // flag to track pin4 trigger status
+bool pin5_On = false; // flag to track pin5 trigger status
+bool pin6_On = false; // flag to track pin6 trigger status
+bool pin7_On = false; // flag to track pin7 trigger status
+bool pin8_On = false; // flag to track pin8 trigger status
+bool pin9_On = false; // flag to track pin9 trigger status
+
+
+const int intervals = 300; // interval at which to blink (milliseconds)
+// bool ledOn = false; // flag to track LED state
 const int ledPin = 27; // the number of the LED pin
 
 void setup()
@@ -77,10 +99,11 @@ void loop()
   /* Read the current voltage level on the A0 analog input pin.
      This is used here to simulate the charge level of a battery.
   */
+  unsigned long currentMillis = millis();
   if (isSubscribed)
   { 
     // Serial.println("Subscribed");
-    long currentMillis = millis();
+    ;
     // if 200ms have passed, check the battery level:
     if (currentMillis - previousMillis >= 10000)
     {
@@ -99,12 +122,53 @@ void loop()
     }
   }
 
-  if (ledOn && (millis() - previousMilliss >= intervals)) {
-    digitalWrite(16, LOW); // Turn off the LED
-    digitalWrite(17, LOW); // Turn off the LED
-    digitalWrite(ledPin, LOW); // Turn off the LED
-    ledOn = false;
+
+  if (pin1_On && (currentMillis - pVestMillis1 >= intervals)) {
+    Serial.println("turning off pin 1");
+    haptix_off(16,17);
+    pin1_On = false;
   }
+  if (pin2_On && (currentMillis - pVestMillis2 >= intervals)) {
+    Serial.println("turning off pin 2");
+    haptix_off(18,17);
+    pin2_On = false;
+  }
+  if (pin3_On && (currentMillis - pVestMillis3 >= intervals)) {
+    Serial.println("turning off pin 3");
+    haptix_off(21,17);
+    pin3_On = false;
+  }
+  if (pin4_On && (currentMillis - pVestMillis4 >= intervals)) {
+    Serial.println("turning off pin 4");
+    haptix_off(16,19);
+    pin4_On = false;
+  }
+  if (pin5_On && (currentMillis - pVestMillis5 >= intervals)) {
+    Serial.println("turning off pin 5");
+    haptix_off(18,19);
+    pin5_On = false;
+  }
+  if (pin6_On && (currentMillis - pVestMillis6 >= intervals)) {
+    Serial.println("turning off pin 6");
+    haptix_off(21,19);
+    pin6_On = false;
+  }
+  if (pin7_On && (currentMillis - pVestMillis7 >= intervals)) {
+    Serial.println("turning off pin 7");
+    haptix_off(16,22);
+    pin7_On = false;
+  }
+  if (pin8_On && (currentMillis - pVestMillis8 >= intervals)) {
+    Serial.println("turning off pin 8");
+    haptix_off(18,22);
+    pin8_On = false;
+  }
+  if (pin9_On && (currentMillis - pVestMillis9 >= intervals)) {
+    Serial.println("turning off pin 9");
+    haptix_off(21,22);
+    pin9_On = false;
+  }
+  
   // poll for Bluetooth® Low Energy events
   BLE.poll();
 }
@@ -144,49 +208,67 @@ void hapticCharacteristicWritten(BLEDevice central, BLECharacteristic characteri
       Serial.print(" ");
     }
     Serial.println(" ");
-    // unsigned int dataHex[42] = {};
-    // Serial.println(hapticCharacteristic.readValue(dataHex, 300));
-    // Serial.println(hapticCharacteristic.valueSize());
-    // Serial.println(dataHex[0]);
+
     if ((buffer[0]) == 1) {
-      
-      haptix(16,17,10,10);
-      digitalWrite(ledPin, HIGH);
-      ledOn = true;
-      previousMilliss = millis();
-      
-      
+      Serial.println("compared to 1 ok");
+      haptix_on(16,17,10,10);
+      pVestMillis1 = millis();
+      pin1_On = true;
     }
-    // if ((buffer[0]) == 2) {
-    //   haptix(18,17,10,10);
-    // }
-    // if ((buffer[0]) == 3) {
-    //   haptix(21,17,10,10);
-    // }
-    // if ((buffer[0]) == 4) {
-    //   haptix(16,19,10,10);
-    // }
-    // if ((buffer[0]) == 5) {
-    //   haptix(18,19,10,10);
-    // }
-    // if ((buffer[0]) == 6) {
-    //   haptix(21,19,10,10);
-    // }
-    // if ((buffer[0]) == 7) {
-    //   haptix(16,22,10,10);
-    // }
-    // if ((buffer[0]) == 8) {
-    //   haptix(18,22,10,10);
-    // }
-    // if ((buffer[0]) == 9) {
-    //   haptix(21,22,10,10);
-    // }
+    if ((buffer[0]) == 2) {
+      Serial.println("compared to 2 ok");
+      haptix_on(18,17,10,10);
+      pVestMillis2 = millis();
+      pin2_On = true;
+    }
+    if ((buffer[0]) == 3) {
+      Serial.println("compared to 3 ok");
+      haptix_on(21,17,10,10);
+      pVestMillis3 = millis();
+      pin3_On = true;
+    }
+    if ((buffer[0]) == 4) {
+      Serial.println("compared to 4 ok");
+      haptix_on(16,19,10,10);
+      pVestMillis4 = millis();
+      pin4_On = true;
+    }
+    if ((buffer[0]) == 5) {
+      Serial.println("compared to 5 ok");
+      haptix_on(18,19,10,10);
+      pVestMillis5 = millis();
+      pin5_On = true;
+    }
+    if ((buffer[0]) == 6) {
+      Serial.println("compared to 6 ok");
+      haptix_on(21,19,10,10);
+      pVestMillis6 = millis();
+      pin6_On = true;
+    }
+    if ((buffer[0]) == 7) {
+      Serial.println("compared to 7 ok");
+      haptix_on(16,22,10,10);
+      pVestMillis7 = millis();
+      pin7_On = true;
+    }
+    if ((buffer[0]) == 8) {
+      Serial.println("compared to 8 ok");
+      haptix_on(18,22,10,10);
+      pVestMillis8 = millis();
+      pin8_On = true;
+    }
+    if ((buffer[0]) == 9) {
+      Serial.println("compared to 9 ok");
+      haptix_on(21,22,10,10);
+      pVestMillis9 = millis();
+      pin9_On = true;
+    }
 
 
 
 
-    Serial.println("LED on");
-    digitalWrite(ledPin, HIGH);
+    // Serial.println("LED on");
+    // digitalWrite(ledPin, HIGH);
   }
   else
   {
@@ -207,36 +289,14 @@ void endBatteryLevel(BLEDevice central, BLECharacteristic characteristic)
   isSubscribed = false;
 }
 
-void haptix(int pin_num1, int pin_num2, int delay_time, int impulse){
+void haptix_on(int pin_num1, int pin_num2, int delay_time, int impulse){
+  // turn on the haptics
   digitalWrite(pin_num1, HIGH);
   digitalWrite(pin_num2, HIGH);
-  // Serial.print(pin_num1); Serial.print(" , "); Serial.println(pin_num2);
-  
-  
-  // delay(delay_time);
-  // digitalWrite(pin_num1, LOW);
-  // digitalWrite(pin_num2, LOW);
-
-  // haptix_off();
 }
 
-// void haptix_off(){
-//   unsigned long millisec = millis();
-  
-//   if (millisec - preMillis >= interval) {
-
-//     // save the last time you blinked the LED
-//     preMillis = millisec;
-//     digitalWrite(16, LOW);
-//     digitalWrite(17, LOW);
-//     Serial.println(millisec);
-//   }
-
-//     // // if the LED is off turn it on and vice-versa:
-//     // if (ledState == LOW) {
-//     //   ledState = HIGH;
-//     // } else {
-//     //   ledState = LOW;
-//     // }
-
-// }
+void haptix_off(int pin_num1, int pin_num2){
+  // turn off the haptics
+  digitalWrite(pin_num1, LOW);
+  digitalWrite(pin_num2, LOW);
+}
