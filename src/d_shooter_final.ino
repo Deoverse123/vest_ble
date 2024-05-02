@@ -23,6 +23,20 @@ unsigned long pVestMillis6 = 0; // millis for point 6
 unsigned long pVestMillis7 = 0; // millis for point 7
 unsigned long pVestMillis8 = 0; // millis for point 8
 unsigned long pVestMillis9 = 0; // millis for point 9
+unsigned long pVestMillis10 = 0; // millis for point 10
+unsigned long pVestMillis11 = 0; // millis for point 11
+unsigned long pVestMillis12 = 0; // millis for point 12
+unsigned long pVestMillis13 = 0; // millis for point 13
+unsigned long pVestMillis14 = 0; // millis for point 14
+unsigned long pVestMillis15 = 0; // millis for point 15
+unsigned long pVestMillis16 = 0; // millis for point 16
+unsigned long pVestMillis17 = 0; // millis for point 17
+unsigned long pVestMillis18 = 0; // millis for point 18
+
+
+
+
+
 
 bool pin1_On = false; // flag to track pin1 trigger status
 bool pin2_On = false; // flag to track pin2 trigger status
@@ -33,6 +47,20 @@ bool pin6_On = false; // flag to track pin6 trigger status
 bool pin7_On = false; // flag to track pin7 trigger status
 bool pin8_On = false; // flag to track pin8 trigger status
 bool pin9_On = false; // flag to track pin9 trigger status
+bool pin10_On = false; // flag to track pin10 trigger status
+bool pin11_On = false; // flag to track pin11 trigger status
+bool pin12_On = false; // flag to track pin12 trigger status
+bool pin13_On = false; // flag to track pin13 trigger status
+bool pin14_On = false; // flag to track pin14 trigger status
+bool pin15_On = false; // flag to track pin15 trigger status
+bool pin16_On = false; // flag to track pin16 trigger status
+bool pin17_On = false; // flag to track pin17 trigger status
+bool pin18_On = false; // flag to track pin18 trigger status
+
+
+
+
+
 
 
 const int intervals = 300; // how long the haptic vibrate
@@ -52,6 +80,12 @@ void setup()
   pinMode(19, OUTPUT);
   pinMode(21, OUTPUT);
   pinMode(22, OUTPUT);
+  pinMode(25, OUTPUT);
+  pinMode(27, OUTPUT);
+  pinMode(23, OUTPUT);
+  
+
+
 
   // begin initialization
   if (!BLE.begin())
@@ -165,7 +199,51 @@ void loop()
     haptix_off(21,22);
     pin9_On = false;
   }
-  
+   if (pin10_On && (currentMillis - pVestMillis10 >= intervals)) {
+    Serial.println("turning off pin 10");
+    haptix_off(16,25);
+    pin10_On = false;
+  }
+   if (pin11_On && (currentMillis - pVestMillis11 >= intervals)) {
+    Serial.println("turning off pin 11");
+    haptix_off(18,25);
+    pin11_On = false;
+  }
+  if (pin12_On && (currentMillis - pVestMillis12 >= intervals)) {
+    Serial.println("turning off pin 12");
+    haptix_off(21,25);
+    pin12_On = false;
+  }
+  if (pin13_On && (currentMillis - pVestMillis13 >= intervals)) {
+    Serial.println("turning off pin 13");
+    haptix_off(16,27);
+    pin13_On = false;
+  }
+   if (pin14_On && (currentMillis - pVestMillis14 >= intervals)) {
+    Serial.println("turning off pin 14");
+    haptix_off(18,27);
+    pin14_On = false;
+  }
+  if (pin15_On && (currentMillis - pVestMillis15 >= intervals)) {
+    Serial.println("turning off pin 15");
+    haptix_off(21,27);
+    pin15_On = false;
+  }
+   if (pin16_On && (currentMillis - pVestMillis16 >= intervals)) {
+    Serial.println("turning off pin 16");
+    haptix_off(16,23);
+    pin16_On = false;
+  } 
+  if (pin17_On && (currentMillis - pVestMillis17 >= intervals)) {
+    Serial.println("turning off pin 17");
+    haptix_off(18,23);
+    pin17_On = false;
+  } 
+  if (pin18_On && (currentMillis - pVestMillis18 >= intervals)) {
+    Serial.println("turning off pin 18");
+    haptix_off(21,23);
+    pin18_On = false;
+  }
   // poll for Bluetooth® Low Energy events
   BLE.poll();
 }
@@ -259,6 +337,60 @@ void hapticCharacteristicWritten(BLEDevice central, BLECharacteristic characteri
       haptix_on(21,22,255);
       pVestMillis9 = millis();
       pin9_On = true;
+    }
+    if ((buffer[0]) == 10) {
+      Serial.println("compared to 10 ok");
+      haptix_on(16,25,255);
+      pVestMillis10 = millis();
+      pin10_On = true;
+    }
+    if ((buffer[0]) == 11) {
+      Serial.println("compared to 11 ok");
+      haptix_on(18,25,255);
+      pVestMillis11 = millis();
+      pin11_On = true;
+    }
+    if ((buffer[0]) == 12) {
+      Serial.println("compared to 12 ok");
+      haptix_on(21,25,255);
+      pVestMillis12 = millis();
+      pin12_On = true;
+    }
+     if ((buffer[0]) == 13) {
+      Serial.println("compared to 13 ok");
+      haptix_on(16,27,255);
+      pVestMillis13 = millis();
+      pin13_On = true;
+    }
+     if ((buffer[0]) == 14) {
+      Serial.println("compared to 14 ok");
+      haptix_on(18,27,255);
+      pVestMillis14 = millis();
+      pin14_On = true;
+    }
+     if ((buffer[0]) == 15) {
+      Serial.println("compared to 15 ok");
+      haptix_on(21,27,255);
+      pVestMillis15 = millis();
+      pin15_On = true;
+    }
+     if ((buffer[0]) == 16) {
+      Serial.println("compared to 16 ok");
+      haptix_on(16,23,255);
+      pVestMillis16 = millis();
+      pin16_On = true;
+    }
+    if ((buffer[0]) == 17) {
+      Serial.println("compared to 17 ok");
+      haptix_on(18,23,255);
+      pVestMillis17 = millis();
+      pin17_On = true;
+    }
+     if ((buffer[0]) == 18) {
+      Serial.println("compared to 18 ok");
+      haptix_on(21,23,255);
+      pVestMillis18 = millis();
+      pin18_On = true;
     }
 
   }
