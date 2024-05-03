@@ -28,7 +28,7 @@ void setup() {
   pinMode(21, OUTPUT);
   pinMode(22, OUTPUT);
   pinMode(25, OUTPUT);
-  pinMode(27, OUTPUT);
+  pinMode(32, OUTPUT);
   pinMode(23, OUTPUT);
 }
 
@@ -189,36 +189,36 @@ void loop() {
       break;
     case 13:
       if (pin13_On) {
-        haptix_off(16,27);
+        haptix_off(16,32);
         pin13_On = false;
         Serial.println("turning off pin 13");
        }
        else{
-        haptix_on(16,27,255);
+        haptix_on(16,32,255);
         pin13_On = true;
         Serial.println("turning ON pin 13");
        }
       break;
     case 14:
       if (pin14_On) {
-        haptix_off(18,27);
+        haptix_off(18,32);
         pin14_On = false;
         Serial.println("turning off pin 14");
        }
        else{
-        haptix_on(18,27,255);
+        haptix_on(18,32,255);
         pin14_On = true;
         Serial.println("turning ON pin 14");
        }
       break;
     case 15:
       if (pin15_On) {
-        haptix_off(21,27);
+        haptix_off(21,32);
         pin15_On = false;
         Serial.println("turning off pin 15");
        }
        else{
-        haptix_on(21,27,255);
+        haptix_on(21,32,255);
         pin15_On = true;
         Serial.println("turning ON pin 15");
        }
