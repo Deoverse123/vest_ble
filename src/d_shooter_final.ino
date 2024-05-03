@@ -81,7 +81,7 @@ void setup()
   pinMode(21, OUTPUT);
   pinMode(22, OUTPUT);
   pinMode(25, OUTPUT);
-  pinMode(27, OUTPUT);
+  pinMode(32, OUTPUT);
   pinMode(23, OUTPUT);
   
 
@@ -216,17 +216,17 @@ void loop()
   }
   if (pin13_On && (currentMillis - pVestMillis13 >= intervals)) {
     Serial.println("turning off pin 13");
-    haptix_off(16,27);
+    haptix_off(16,32);
     pin13_On = false;
   }
    if (pin14_On && (currentMillis - pVestMillis14 >= intervals)) {
     Serial.println("turning off pin 14");
-    haptix_off(18,27);
+    haptix_off(18,32);
     pin14_On = false;
   }
   if (pin15_On && (currentMillis - pVestMillis15 >= intervals)) {
     Serial.println("turning off pin 15");
-    haptix_off(21,27);
+    haptix_off(21,32);
     pin15_On = false;
   }
    if (pin16_On && (currentMillis - pVestMillis16 >= intervals)) {
@@ -358,19 +358,19 @@ void hapticCharacteristicWritten(BLEDevice central, BLECharacteristic characteri
     }
      if ((buffer[0]) == 13) {
       Serial.println("compared to 13 ok");
-      haptix_on(16,27,255);
+      haptix_on(16,32,255);
       pVestMillis13 = millis();
       pin13_On = true;
     }
      if ((buffer[0]) == 14) {
       Serial.println("compared to 14 ok");
-      haptix_on(18,27,255);
+      haptix_on(18,32,255);
       pVestMillis14 = millis();
       pin14_On = true;
     }
      if ((buffer[0]) == 15) {
       Serial.println("compared to 15 ok");
-      haptix_on(21,27,255);
+      haptix_on(21,32,255);
       pVestMillis15 = millis();
       pin15_On = true;
     }
