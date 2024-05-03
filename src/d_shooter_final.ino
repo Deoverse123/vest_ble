@@ -106,7 +106,7 @@ void loop() {
     case 6:
       if (pin6_On) {
         haptix_off(21,19);
-        pin1_On = false;
+        pin6_On = false;
         Serial.println("turning off pin 6");
        }
        else{
